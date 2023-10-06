@@ -1,0 +1,4 @@
+env
+__pycache__
+paths.json
+get_bot_config.py
