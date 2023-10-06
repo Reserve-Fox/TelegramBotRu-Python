@@ -23,10 +23,10 @@ async def on_startup() -> None:
     """
     Уведомление об удачном запуске бота.
     """
-    print('\nБот вышел в онлайн!')
+    bot_logger.INFO.info(msg='Бот вышел в онлайн!')
 
     await bot.send_message(
-        chat_id='-',
+        chat_id='6174484025',
         text="<b>Я проснулась!</b>"
     )
 
@@ -38,7 +38,7 @@ async def on_shutdown() -> None:
     Уведомление об выключении бота.
     """
     await bot.send_message(
-        chat_id='-',
+        chat_id='6174484025',
         text="<b>Я ухожу спать!</b>"
     )
 
@@ -46,4 +46,4 @@ async def on_shutdown() -> None:
 
 
 if __name__ != '__main__':
-    print(f'Импортирован модуль {__name__} версии {__version__}')
+    print(f'----Импортирован модуль {__name__} версии {__version__}\n')

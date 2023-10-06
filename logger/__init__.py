@@ -18,7 +18,7 @@ from typing import Tuple
 
 
 if __name__ != '__main__':
-    print(f'Импортирован модуль {__name__} версии {__version__}')
+    print(f'\nИмпортирован пакет {__name__} версии {__version__}\n')
     import logging
 
     # Список логгеров для присоединения
@@ -32,7 +32,7 @@ if __name__ != '__main__':
 
     # Форматтер сообщений
     formatter = logging.Formatter(
-        fmt='%(asctime)s - %(module)s - %(name)s - %(levelname)s - %(message)s'
+        fmt='%(asctime)s - %(module)s - %(levelname)s - %(message)s'
     )
 
     # Настраиваем логгеры для вывода в терминал
