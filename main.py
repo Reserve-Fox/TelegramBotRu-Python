@@ -27,7 +27,7 @@ from types import ModuleType
 # ---------------------------------------------------------------------
 async def get_routers_from_packages(path: str) -> Dict[str, Router]:
     """
-    Подключает пакеты с функционалом к боту,
+    Подключает пакеты с функционалом для бота,
     используя main_router в __init__.py файлах.
 
     Args:
@@ -37,13 +37,14 @@ async def get_routers_from_packages(path: str) -> Dict[str, Router]:
     routers_dict: Dict[str, Router] = {}
 
     # Получаем название пакетов в папке с функционалом бота
+    # Игнорируем файлы с расширениями
     packages: List[str] = [item for item in os.listdir(path=path) if '.' not in item]
     for package in packages:
-        # Пытаемся получить модуль при помощи импорта
+        # Пытаемся получить пакет при помощи импорта
         try:
             module: ModuleType = importlib.import_module(name=f'{path}.{package}')
         except ModuleNotFoundError as error:
-            print(f'Не удалось найти модуль {package}\n', error)
+            bot_logger.WARNING.warning(msg=f'Не удалось найти пакет {package}\n{error}')
             continue
         # Достаём роутер из файла инициализации пакета
         router: Router = getattr(module, 'main_router')
@@ -64,12 +65,12 @@ async def register_routers(routers: Dict[str, Router]) -> None:
         try:
             dp.include_router(router=router)
         except ValueError as error:
-            print(f'Не удалось подключить роутер {router_name}\n', error)
+            bot_logger.WARNING.warning(msg=f'Не удалось подключить роутер {router_name}\n{error}')
 
 
 # ---------------------------------------------------------------------
 bot = Bot(
-    token='-',
+    token='6558976211:AAHm-cOWzabOkIFflk02SkHLxkC8cRGETLY',
     parse_mode=ParseMode.HTML
 )
 dp = Dispatcher()
@@ -78,12 +79,15 @@ dp = Dispatcher()
 # ---------------------------------------------------------------------
 async def main() -> None:
     """Основная функция для подготовки бота"""
-    # Получаем роутеры с функционлаом бота
+    bot_logger.INFO.info(msg='Началось получение роутеров!')
+    # Получаем роутеры с функционалом для бота
     routers: Dict[str, Router] = await get_routers_from_packages(path='bot_modules')
 
+    bot_logger.INFO.info(msg='Началась регистрация роутеров!')
     # Регистрируем роутеры
     await register_routers(routers=routers)
 
+    bot_logger.INFO.info(msg='Началась финальная подготовка бота!')
     # Отбрасываем все накопившиеся обновления
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
@@ -93,13 +97,10 @@ async def main() -> None:
 if __name__ == '__main__':
     from aiogram.exceptions import TelegramUnauthorizedError
 
+    bot_logger.INFO.info(msg='Начался запуск бота!')
     try:
         asyncio.run(main=main())
     except KeyboardInterrupt:
-        print(
-            'Бот отключён!'
-        )
+        bot_logger.INFO.info(msg='Бот отключён!')
     except TelegramUnauthorizedError as error:
-        print(
-            'Токен бота не действительный!', error, sep='\n'
-        )
+        bot_logger.CRITICAL.critical(msg=f'Токен бота не действителен!\n{error}')
