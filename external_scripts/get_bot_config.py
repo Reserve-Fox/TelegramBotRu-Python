@@ -11,11 +11,11 @@ __all__: list[str] = ['bot_config']
 
 import json
 
-from os.path import sep as os_separator
 from string import Template
 from dataclasses import dataclass
 
 from logger import bot_logger
+from external_scripts.change_path_separators_on_os import change_separators
 
 from typing import Dict, Union
 
@@ -41,7 +41,7 @@ class BotConfig:
 
     def __str__(self) -> str:
         raw_template: Template = Template(template="""
-Мнформация из конфига для бота:
+Информация из конфига для бота:
     Master data: $master_data
     Bot data: $bot_data
     DataBase: $database_data
@@ -76,42 +76,45 @@ def get_json_config_data(path: str) -> ReadedJsonConfig:
     return config_data
 
 
-def edit_json_config_paths_for_os(config: ReadedJsonConfig, old_sep: str) -> ReadedJsonConfig:
+def edit_json_config_paths_for_os(config: ReadedJsonConfig, old_sep: str) -> None:
     """
     edit_json_config_paths_for_os заменяет старый разделитель
-    в путях конфига, на разделитель путей ОС
+    путей в конфиге, на разделитель путей ОС.
+
+    *Изменяет полученный конфиг, не возвращает новый!
 
     Args:
-        config (ReadedJsonConfig): считаный конфиг.
+        config (ReadedJsonConfig): конфиг для изменения.
         old_sep (str): разделитель путей в конфиге.
-
-    Returns:
-        ReadedJsonConfig: изменённый конфиг.
     """
     def replace_char_in_dict(
-            dict_: Dict[str, Union[str, Dict[str, str]]],
-            old_char: str,
-            new_char: str) -> None:
+            data: Union[ReadedJsonConfig, Dict[str, str]],
+            old_char: str) -> None:
         """
-        Рекурсивная функция для замены разделителя.
+        Рекурсивная функция для замены разделителя в путях.
+
+        В конфиге пути находятся в записи вида: 
+            папка1: {путь1: path, путь2: path}
+            папка2: {путь1: path, путь2: path}
         """
-        for key, value in dict_.items():
+        for key, value in data.items():
             # Является ли значение словарём со строками
             if isinstance(value, dict):
                 replace_char_in_dict(
-                    dict_=value,
-                    old_char=old_char,
-                    new_char=new_char
+                    data=value,
+                    old_char=old_char
                 )
             else:
-                dict_[key] = value.replace(old_char, new_char)
+                data[key] = change_separators(
+                    old_sep=old_char,
+                    path=value
+                )
 
     # Замена разделителей
     replace_char_in_dict(
-        dict_=config, old_char=old_sep, new_char=os_separator
+        data=config,
+        old_char=old_sep
     )
-
-    return config
 
 
 def create_bot_config(config_data: ReadedJsonConfig) -> BotConfig:
@@ -136,12 +139,13 @@ def create_bot_config(config_data: ReadedJsonConfig) -> BotConfig:
 
 
 if __name__ != '__main__':
-    print(f'Импортирован модуль {__name__} версии {__version__}\n')
+    print(f'Импортирован модуль {__name__} версии {__version__}')
 
     # Получаем данные из файла конфигурации
     try:
         TBotConfig: ReadedJsonConfig = get_json_config_data(
-            path='Bot_config.json')
+            path='Bot_config.json'
+        )
     except FileNotFoundError as error:
         bot_logger.CRITICAL.critical(
             msg=f"Файл конфигурации не найден! {error}"
@@ -153,7 +157,7 @@ if __name__ != '__main__':
 
     # Редактируем пути в конфиге
     try:
-        new_config_data: ReadedJsonConfig = edit_json_config_paths_for_os(
+        edit_json_config_paths_for_os(
             config=TBotConfig,
             old_sep='|'
         )
@@ -164,5 +168,8 @@ if __name__ != '__main__':
 
     # Завершение конфигурации для бота
     bot_config: BotConfig = create_bot_config(
-        config_data=new_config_data
+        config_data=TBotConfig
     )
+
+    # Вывод конфига
+    print(bot_config)
