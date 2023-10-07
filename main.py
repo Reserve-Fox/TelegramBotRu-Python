@@ -6,9 +6,12 @@
 """
 
 __author__ = 'Reserve-Fox'
-__version__ = 0.1
+__version__ = 0.2
 
-__all__: list[str] = ['bot_logger', 'bot', 'dp']
+__all__: list[str] = [
+    'bot_logger', 'bot_config',
+    'bot', 'dp'
+]
 
 import asyncio
 import os
@@ -18,6 +21,7 @@ from aiogram.enums import ParseMode
 from aiogram import Bot, Dispatcher, Router
 
 from external_scripts import show_neko_terminal
+from external_scripts.get_bot_config import bot_config
 from logger import *
 
 from typing import List, Dict
@@ -38,13 +42,16 @@ async def get_routers_from_packages(path: str) -> Dict[str, Router]:
 
     # Получаем название пакетов в папке с функционалом бота
     # Игнорируем файлы с расширениями
-    packages: List[str] = [item for item in os.listdir(path=path) if '.' not in item]
+    packages: List[str] = [item for item in os.listdir(
+        path=path) if '.' not in item]
     for package in packages:
         # Пытаемся получить пакет при помощи импорта
         try:
-            module: ModuleType = importlib.import_module(name=f'{path}.{package}')
+            module: ModuleType = importlib.import_module(
+                name=f'{path}.{package}')
         except ModuleNotFoundError as error:
-            bot_logger.WARNING.warning(msg=f'Не удалось найти пакет {package}\n{error}')
+            bot_logger.WARNING.warning(
+                msg=f'Не удалось найти пакет {package}\n{error}')
             continue
         # Достаём роутер из файла инициализации пакета
         router: Router = getattr(module, 'main_router')
@@ -65,12 +72,13 @@ async def register_routers(routers: Dict[str, Router]) -> None:
         try:
             dp.include_router(router=router)
         except ValueError as error:
-            bot_logger.WARNING.warning(msg=f'Не удалось подключить роутер {router_name}\n{error}')
+            bot_logger.WARNING.warning(
+                msg=f'Не удалось подключить роутер {router_name}\n{error}')
 
 
 # ---------------------------------------------------------------------
 bot = Bot(
-    token='6558976211:AAHm-cOWzabOkIFflk02SkHLxkC8cRGETLY',
+    token=bot_config.Bot['Token'],
     parse_mode=ParseMode.HTML
 )
 dp = Dispatcher()
@@ -103,4 +111,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         bot_logger.INFO.info(msg='Бот отключён!')
     except TelegramUnauthorizedError as error:
-        bot_logger.CRITICAL.critical(msg=f'Токен бота не действителен!\n{error}')
+        bot_logger.CRITICAL.critical(
+            msg=f'Токен бота не действителен!\n{error}')

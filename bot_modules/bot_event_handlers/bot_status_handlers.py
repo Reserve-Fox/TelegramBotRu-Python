@@ -26,7 +26,7 @@ async def on_startup() -> None:
     bot_logger.INFO.info(msg='Бот вышел в онлайн!')
 
     await bot.send_message(
-        chat_id='6174484025',
+        chat_id=bot_config.Master['ID'],
         text="<b>Я проснулась!</b>"
     )
 
@@ -38,7 +38,7 @@ async def on_shutdown() -> None:
     Уведомление об выключении бота.
     """
     await bot.send_message(
-        chat_id='6174484025',
+        chat_id=bot_config.Master['ID'],
         text="<b>Я ухожу спать!</b>"
     )
 
