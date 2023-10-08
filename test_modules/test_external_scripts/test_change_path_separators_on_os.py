@@ -22,24 +22,27 @@ class TestChangeSeparators(unittest.TestCase):
             Dict[str, str]: old_separator, old_path
         """
         # Получаем случайный знак разделителя
-        old_separator: str = random.choice(seq=string.punctuation)
+        random_separator: str = random.choice(seq=string.punctuation)
 
         # Генерируем случайный путь для теста
-        old_path: str = old_separator.join(
+        random_path: str = random_separator.join(
             [
-                ''.join(random.choices(
-                    population=string.ascii_lowercase,
-                    k=random.randint(a=1, b=10)
-                ))
+                ''.join(
+                    random.choices(
+                        population=string.ascii_lowercase,
+                        k=random.randint(a=1, b=10)
+                    )
+                )
                 for _ in range(random.randint(a=4, b=10))
             ]
         )
 
-        return {'old_separator': old_separator, 'old_path': old_path}
+        return {'old_separator': random_separator, 'old_path': random_path}
 
     def setUp(self) -> None:
         # Создаём словарь для теста
         self.data: Union[Dict[str, str], None] = self.generate_test_data()
+
         # Создаём контрольное значение для теста
         self.data['new_path'] = self.data['old_path'].replace(
             self.data['old_separator'],
@@ -61,9 +64,9 @@ class TestChangeSeparators(unittest.TestCase):
             second=self.data['new_path'],
             msg=f'Тест не пройден!\nДанные тестовых значений:\n{self.data}'
         )
-    
+
     def test_function_10_count(self) -> None:
-        for i in range(10):
+        for _ in range(10):
             self.test_function()
 
 

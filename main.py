@@ -38,26 +38,29 @@ async def get_routers_from_packages(path: str) -> Dict[str, Router]:
         path (str): путь к папке с пакетами.
     """
     # Ключ название пакета, значение основной роутер
-    routers_dict: Dict[str, Router] = {}
+    routers: Dict[str, Router] = {}
 
     # Получаем название пакетов в папке с функционалом бота
     # Игнорируем файлы с расширениями
-    packages: List[str] = [item for item in os.listdir(
-        path=path) if '.' not in item]
+    packages: List[str] = [
+        package_name for package_name in os.listdir(path=path) if '.' not in package_name
+    ]
     for package in packages:
         # Пытаемся получить пакет при помощи импорта
         try:
             module: ModuleType = importlib.import_module(
-                name=f'{path}.{package}')
+                name=f'{path}.{package}'
+            )
         except ModuleNotFoundError as error:
             bot_logger.WARNING.warning(
-                msg=f'Не удалось найти пакет {package}\n{error}')
+                msg=f'Не удалось найти пакет {package}\n{error}'
+            )
             continue
         # Достаём роутер из файла инициализации пакета
         router: Router = getattr(module, 'main_router')
         # Добавляем в словарь новый роутер
-        routers_dict[package] = router
-    return routers_dict
+        routers[package] = router
+    return routers
 
 
 # ---------------------------------------------------------------------
@@ -68,12 +71,13 @@ async def register_routers(routers: Dict[str, Router]) -> None:
     Args:
         routers (Dict[str, Router]): словарь с роутерами.
     """
-    for router_name, router in routers.items():
+    for router_name, router_object in routers.items():
         try:
-            dp.include_router(router=router)
+            dp.include_router(router=router_object)
         except ValueError as error:
             bot_logger.WARNING.warning(
-                msg=f'Не удалось подключить роутер {router_name}\n{error}')
+                msg=f'Не удалось подключить роутер {router_name}\n{error}'
+            )
 
 
 # ---------------------------------------------------------------------
@@ -112,4 +116,5 @@ if __name__ == '__main__':
         bot_logger.INFO.info(msg='Бот отключён!')
     except TelegramUnauthorizedError as error:
         bot_logger.CRITICAL.critical(
-            msg=f'Токен бота не действителен!\n{error}')
+            msg=f'Токен бота не действителен!\n{error}'
+        )

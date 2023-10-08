@@ -20,7 +20,7 @@ from external_scripts.change_path_separators_on_os import change_separators
 from typing import Dict, Union
 
 
-class ReadedJsonConfig(Dict[str, Dict[str, str]]):
+class ReadedJson(Dict[str, Dict[str, str]]):
     """
     Класс используемый для типизации в коде.
     Обозначает считанное содержимое JSON файла.
@@ -49,7 +49,7 @@ class BotConfig:
     Urls data: $urls_data
         """)
 
-        data_dict: Dict[str, Dict[str, str]] = {
+        template_data: Dict[str, Dict[str, str]] = {
             'master_data': self.Master,
             'bot_data': self.Bot,
             'database_data': self.DataBase,
@@ -57,10 +57,10 @@ class BotConfig:
             'urls_data': self.Urls,
         }
 
-        return raw_template.safe_substitute(data_dict)
+        return raw_template.safe_substitute(template_data)
 
 
-def get_json_config_data(path: str) -> ReadedJsonConfig:
+def get_json_config_data(path: str) -> ReadedJson:
     """
     get_json_config_data  считывает JSON файл.
 
@@ -70,13 +70,13 @@ def get_json_config_data(path: str) -> ReadedJsonConfig:
     Returns:
         ReadedJsonConfig: считанный JSON.
     """
-    with open(file=path, mode='r') as file:
-        config_data: ReadedJsonConfig = json.load(fp=file)
+    with open(file=path, mode='r') as json_file:
+        config_data: ReadedJson = json.load(fp=json_file)
 
     return config_data
 
 
-def edit_json_config_paths_for_os(config: ReadedJsonConfig, old_sep: str) -> None:
+def edit_json_config_paths_for_os(config: ReadedJson, old_sep: str) -> None:
     """
     edit_json_config_paths_for_os заменяет старый разделитель
     путей в конфиге, на разделитель путей ОС.
@@ -88,7 +88,7 @@ def edit_json_config_paths_for_os(config: ReadedJsonConfig, old_sep: str) -> Non
         old_sep (str): разделитель путей в конфиге.
     """
     def replace_char_in_dict(
-            data: Union[ReadedJsonConfig, Dict[str, str]],
+            data: Union[ReadedJson, Dict[str, str]],
             old_char: str) -> None:
         """
         Рекурсивная функция для замены разделителя в путях.
@@ -117,7 +117,7 @@ def edit_json_config_paths_for_os(config: ReadedJsonConfig, old_sep: str) -> Non
     )
 
 
-def create_bot_config(config_data: ReadedJsonConfig) -> BotConfig:
+def create_bot_config(config_data: ReadedJson) -> BotConfig:
     """
     create_bot_config наполняет dataclass данными из конфига.
 
@@ -143,7 +143,7 @@ if __name__ != '__main__':
 
     # Получаем данные из файла конфигурации
     try:
-        TBotConfig: ReadedJsonConfig = get_json_config_data(
+        TBotConfig: ReadedJson = get_json_config_data(
             path='Bot_config.json'
         )
     except FileNotFoundError as error:
