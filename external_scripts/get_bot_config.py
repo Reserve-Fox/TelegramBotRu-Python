@@ -41,7 +41,7 @@ class BotConfig:
 
     def __str__(self) -> str:
         raw_template: Template = Template(template="""
-Информация из конфига для бота:
+Данные из конфига для бота:
     Master data: $master_data
     Bot data: $bot_data
     DataBase: $database_data
@@ -76,15 +76,16 @@ def get_json_config_data(path: str) -> ReadedJson:
     return config_data
 
 
-def edit_json_config_paths_for_os(config: ReadedJson, old_sep: str) -> None:
+def edit_json_config_paths_for_os(paths_data: ReadedJson, old_sep: str) -> None:
     """
     edit_json_config_paths_for_os заменяет старый разделитель
     путей в конфиге, на разделитель путей ОС.
 
     *Изменяет полученный конфиг, не возвращает новый!
+    *Передавать словарь с путями
 
     Args:
-        config (ReadedJsonConfig): конфиг для изменения.
+        config (Dict[str, str]): конфиг для изменения.
         old_sep (str): разделитель путей в конфиге.
     """
     def replace_char_in_dict(
@@ -112,7 +113,7 @@ def edit_json_config_paths_for_os(config: ReadedJson, old_sep: str) -> None:
 
     # Замена разделителей
     replace_char_in_dict(
-        data=config,
+        data=paths_data,
         old_char=old_sep
     )
 
@@ -130,8 +131,8 @@ def create_bot_config(config_data: ReadedJson) -> BotConfig:
     bot_configuration: BotConfig = BotConfig(
         Master=config_data['Master'],
         Bot=config_data['Bot'],
-        DataBase=config_data['DataBase'],
-        Resources=config_data['Resources'],
+        DataBase=config_data['Paths']['DataBase'],
+        Resources=config_data['Paths']['Resources'],
         Urls=config_data['Urls']
     )
 
@@ -143,7 +144,7 @@ if __name__ != '__main__':
 
     # Получаем данные из файла конфигурации
     try:
-        TBotConfig: ReadedJson = get_json_config_data(
+        bot_config_json_data: ReadedJson = get_json_config_data(
             path='Bot_config.json'
         )
     except FileNotFoundError as error:
@@ -158,7 +159,7 @@ if __name__ != '__main__':
     # Редактируем пути в конфиге
     try:
         edit_json_config_paths_for_os(
-            config=TBotConfig,
+            paths_data=bot_config_json_data['Paths'],
             old_sep='|'
         )
     except json.JSONDecodeError as error:
@@ -168,7 +169,7 @@ if __name__ != '__main__':
 
     # Завершение конфигурации для бота
     bot_config: BotConfig = create_bot_config(
-        config_data=TBotConfig
+        config_data=bot_config_json_data
     )
 
     # Вывод конфига

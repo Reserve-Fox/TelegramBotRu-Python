@@ -9,7 +9,7 @@ import string
 from external_scripts.change_path_separators_on_os import change_separators as change_sep
 
 from os.path import sep as os_sep
-from typing import Dict, Union
+from typing import Dict
 
 
 class TestChangeSeparators(unittest.TestCase):
@@ -41,16 +41,13 @@ class TestChangeSeparators(unittest.TestCase):
 
     def setUp(self) -> None:
         # Создаём словарь для теста
-        self.data: Union[Dict[str, str], None] = self.generate_test_data()
+        self.data: Dict[str, str] = self.generate_test_data()
 
         # Создаём контрольное значение для теста
         self.data['new_path'] = self.data['old_path'].replace(
             self.data['old_separator'],
             os_sep
         )
-
-    def tearDown(self) -> None:
-        self.data = None
 
     def test_function(self) -> None:
         # Получаем путь для теста
