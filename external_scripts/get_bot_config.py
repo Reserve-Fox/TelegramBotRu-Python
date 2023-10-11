@@ -41,7 +41,7 @@ class BotConfig:
 
     def __str__(self) -> str:
         raw_template: Template = Template(template="""
-Данные из конфига для бота:
+Данные конфигурации бота:
     Master data: $master_data
     Bot data: $bot_data
     DataBase: $database_data
@@ -171,6 +171,3 @@ if __name__ != '__main__':
     bot_config: BotConfig = create_bot_config(
         config_data=bot_config_json_data
     )
-
-    # Вывод конфига
-    print(bot_config)

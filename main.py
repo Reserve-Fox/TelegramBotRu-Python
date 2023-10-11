@@ -6,10 +6,10 @@
 """
 
 __author__ = 'Reserve-Fox'
-__version__ = 0.2
+__version__ = 0.3
 
 __all__: list[str] = [
-    'bot_logger', 'bot_config',
+    'bot_logger', 'bot_config', 'bot_database',
     'bot', 'dp'
 ]
 
@@ -23,13 +23,14 @@ from aiogram import Bot, Dispatcher, Router
 from external_scripts import show_neko_terminal
 from external_scripts.get_bot_config import bot_config
 from logger import *
+from module_database import bot_database
 
 from typing import List, Dict
 from types import ModuleType
 
 
 # ---------------------------------------------------------------------
-async def get_routers_from_packages(path: str) -> Dict[str, Router]:
+def get_routers_from_packages(path: str) -> Dict[str, Router]:
     """
     Подключает пакеты с функционалом для бота,
     используя main_router в __init__.py файлах.
@@ -64,7 +65,7 @@ async def get_routers_from_packages(path: str) -> Dict[str, Router]:
 
 
 # ---------------------------------------------------------------------
-async def register_routers(routers: Dict[str, Router]) -> None:
+def register_routers(routers: Dict[str, Router]) -> None:
     """
     Регистрирует роутеры с функционалом для бота в диспатчере.
 
@@ -91,13 +92,14 @@ dp = Dispatcher()
 # ---------------------------------------------------------------------
 async def main() -> None:
     """Основная функция для подготовки бота"""
+
     bot_logger.INFO.info(msg='Началось получение роутеров!')
     # Получаем роутеры с функционалом для бота
-    routers: Dict[str, Router] = await get_routers_from_packages(path='bot_modules')
+    routers: Dict[str, Router] = get_routers_from_packages(path='bot_modules')
 
     bot_logger.INFO.info(msg='Началась регистрация роутеров!')
     # Регистрируем роутеры
-    await register_routers(routers=routers)
+    register_routers(routers=routers)
 
     bot_logger.INFO.info(msg='Началась финальная подготовка бота!')
     # Отбрасываем все накопившиеся обновления
@@ -108,6 +110,8 @@ async def main() -> None:
 # ---------------------------------------------------------------------
 if __name__ == '__main__':
     from aiogram.exceptions import TelegramUnauthorizedError
+
+    print('\n', '-'*79, end='\n\n') # Разделение вывода подготовки и запуска
 
     bot_logger.INFO.info(msg='Начался запуск бота!')
     try:
