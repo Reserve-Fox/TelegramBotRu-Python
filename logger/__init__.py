@@ -7,12 +7,12 @@ __version__ = 1.0
 
 __all__: list[str] = ['bot_logger']
 
-from logger.logger import Logger, setup_logging_to_output
-from logger.debug_logger import logger as debug_log
-from logger.info_logger import logger as info_log
-from logger.warning_logger import logger as warning_log
-from logger.error_logger import logger as error_log
-from logger.critical_logger import logger as critical_log
+from .logger import Logger, setup_logging_to_output
+from .debug_logger import logger as debug_log
+from .info_logger import logger as info_log
+from .warning_logger import logger as warning_log
+from .error_logger import logger as error_log
+from .critical_logger import logger as critical_log
 
 from typing import Tuple
 
