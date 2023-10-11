@@ -20,6 +20,7 @@ from external_scripts.change_path_separators_on_os import change_separators
 from typing import Dict, Union
 
 
+# ---------------------------------------------------------------------
 class ReadedJson(Dict[str, Dict[str, str]]):
     """
     Класс используемый для типизации в коде.
@@ -28,6 +29,7 @@ class ReadedJson(Dict[str, Dict[str, str]]):
     pass
 
 
+# ---------------------------------------------------------------------
 @dataclass
 class BotConfig:
     """
@@ -60,6 +62,7 @@ class BotConfig:
         return raw_template.safe_substitute(template_data)
 
 
+# ---------------------------------------------------------------------
 def get_json_config_data(path: str) -> ReadedJson:
     """
     get_json_config_data  считывает JSON файл.
@@ -76,6 +79,7 @@ def get_json_config_data(path: str) -> ReadedJson:
     return config_data
 
 
+# ---------------------------------------------------------------------
 def edit_json_config_paths_for_os(paths_data: ReadedJson, old_sep: str) -> None:
     """
     edit_json_config_paths_for_os заменяет старый разделитель
@@ -118,6 +122,7 @@ def edit_json_config_paths_for_os(paths_data: ReadedJson, old_sep: str) -> None:
     )
 
 
+# ---------------------------------------------------------------------
 def create_bot_config(config_data: ReadedJson) -> BotConfig:
     """
     create_bot_config наполняет dataclass данными из конфига.
@@ -140,7 +145,7 @@ def create_bot_config(config_data: ReadedJson) -> BotConfig:
 
 
 if __name__ != '__main__':
-    print(f'Импортирован модуль {__name__} версии {__version__}')
+    print(f'Импортирован скрипт {__name__} версии {__version__}')
 
     # Получаем данные из файла конфигурации
     try:

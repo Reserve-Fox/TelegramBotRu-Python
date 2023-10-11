@@ -14,9 +14,11 @@ class DataBaseAPI:
     def connection(self) -> sqlite3.Connection:
         return self.__connection
 
+    # -----------------------------------------------------------------
     def __init__(self, connection: sqlite3.Connection) -> None:
         self.__connection: sqlite3.Connection = connection
 
+    # -----------------------------------------------------------------
     def disconnect(self) -> None:
         self.connection.close()
 

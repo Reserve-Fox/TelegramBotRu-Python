@@ -39,4 +39,4 @@ __version__ = 1.0
 
 if __name__ != '__main__':
     print(__doc__)
-    print(f'Импортирован модуль {__name__} версии {__version__}')
+    print(f'Импортирован скрипт {__name__} версии {__version__}')
